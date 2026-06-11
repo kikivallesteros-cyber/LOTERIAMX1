@@ -5,7 +5,7 @@ using LOTERIAMX1.Domain.Enums;
 
 /// <summary>
 Formulario para configurar el juego antes de iniciarlo.
-/// Permite seleccionar tamaño de tabla, cartas dobles, y formatos de victoria.
+Permite seleccionar tamaño de tabla, cartas dobles, y formatos de victoria.
 /// </summary>
 public partial class FormConfiguracion : Form
 {
@@ -25,6 +25,10 @@ public partial class FormConfiguracion : Form
         // Configurar colores temáticos
         BackColor = Color.FromArgb(254, 243, 210); // Amarillo cálido
         ForeColor = Color.FromArgb(40, 20, 10);    // Marrón oscuro
+        Text = "⚙️ Configuración del Juego - LOTERIAMX1";
+        Width = 700;
+        Height = 900;
+        StartPosition = FormStartPosition.CenterScreen;
 
         // Panel principal
         var panelPrincipal = new Panel
@@ -49,20 +53,21 @@ public partial class FormConfiguracion : Form
         // Sección: Tamaño de tabla
         var grpTamaño = new GroupBox
         {
-            Text = "📏 Tamaño de Tabla",
+            Text = "📄 Tamaño de Tabla",
             Font = new Font("Segoe UI", 11, FontStyle.Bold),
             ForeColor = Color.FromArgb(0, 104, 56),
             Margin = new Padding(0, 0, 0, 15),
             Padding = new Padding(15),
             Width = panelPrincipal.Width - 40,
-            Height = 100
+            Height = 100,
+            AutoSize = false
         };
 
         var cmbTamaño = new ComboBox
         {
             DropDownStyle = ComboBoxStyle.DropDownList,
             Font = new Font("Segoe UI", 10),
-            Width = 200,
+            Width = 250,
             Location = new Point(15, 30)
         };
         cmbTamaño.Items.AddRange(new object[] { "4x4", "5x5 (Recomendado)", "6x6", "7x7", "8x8", "9x9", "10x10" });
@@ -71,40 +76,82 @@ public partial class FormConfiguracion : Form
         grpTamaño.Controls.Add(cmbTamaño);
         panelPrincipal.Controls.Add(grpTamaño);
 
-        // Sección: Cartas Dobles
-        var grpDobles = new GroupBox
+        // Sección: Tipo de Partida (CON o SIN DOBLES)
+        var grpTipoPartida = new GroupBox
         {
-            Text = "🃏 Cartas Dobles",
+            Text = "🎰 Tipo de Partida - Cartas Dobles",
             Font = new Font("Segoe UI", 11, FontStyle.Bold),
-            ForeColor = Color.FromArgb(0, 104, 56),
+            ForeColor = Color.FromArgb(206, 17, 38),
             Margin = new Padding(0, 0, 0, 15),
             Padding = new Padding(15),
             Width = panelPrincipal.Width - 40,
-            Height = 120
+            Height = 180,
+            AutoSize = false
         };
 
-        var rbDoblesSí = new RadioButton
+        var rbConDobles = new RadioButton
         {
-            Text = "✓ Permitir cartas repetidas (Dobles)",
+            Text = "✓ CON DOBLES - Permite cartas repetidas en la tabla",
             Font = new Font("Segoe UI", 10),
             Checked = _config.PermitirCartasDobles,
             Location = new Point(15, 30),
+            AutoSize = true,
+            Width = 600
+        };
+        rbConDobles.CheckedChanged += (s, e) =>
+        {
+            if (rbConDobles.Checked)
+                _config.PermitirCartasDobles = true;
+        };
+
+        var lblExplicacionDobles = new Label
+        {
+            Text = "→ Misma carta puede aparecer varias veces en tu tabla",
+            Font = new Font("Segoe UI", 9),
+            ForeColor = Color.FromArgb(120, 80, 40),
+            Location = new Point(35, 55),
             AutoSize = true
         };
-        rbDoblesSí.CheckedChanged += (s, e) => _config.PermitirCartasDobles = rbDoblesSí.Checked;
 
-        var rbDobblesNo = new RadioButton
+        var rbSinDobles = new RadioButton
         {
-            Text = "✗ Sin dobles (todas únicas)",
+            Text = "✗ SIN DOBLES - Todas las cartas son únicas en la tabla",
             Font = new Font("Segoe UI", 10),
             Checked = !_config.PermitirCartasDobles,
-            Location = new Point(15, 60),
+            Location = new Point(15, 85),
+            AutoSize = true,
+            Width = 600
+        };
+        rbSinDobles.CheckedChanged += (s, e) =>
+        {
+            if (rbSinDobles.Checked)
+                _config.PermitirCartasDobles = false;
+        };
+
+        var lblExplicacionSinDobles = new Label
+        {
+            Text = "→ Cada carta solo aparece una vez (todas diferentes)",
+            Font = new Font("Segoe UI", 9),
+            ForeColor = Color.FromArgb(120, 80, 40),
+            Location = new Point(35, 110),
             AutoSize = true
         };
 
-        grpDobles.Controls.Add(rbDoblesSí);
-        grpDobles.Controls.Add(rbDobblesNo);
-        panelPrincipal.Controls.Add(grpDobles);
+        var lblAdvertencia = new Label
+        {
+            Text = "⚠️ Nota: Esta opción se aplica a TODOS los jugadores",
+            Font = new Font("Segoe UI", 9, FontStyle.Italic),
+            ForeColor = Color.FromArgb(206, 17, 38),
+            Location = new Point(15, 135),
+            AutoSize = true
+        };
+
+        grpTipoPartida.Controls.Add(rbConDobles);
+        grpTipoPartida.Controls.Add(lblExplicacionDobles);
+        grpTipoPartida.Controls.Add(rbSinDobles);
+        grpTipoPartida.Controls.Add(lblExplicacionSinDobles);
+        grpTipoPartida.Controls.Add(lblAdvertencia);
+        panelPrincipal.Controls.Add(grpTipoPartida);
 
         // Sección: Formatos Ganadores
         var grpFormatos = new GroupBox
@@ -115,7 +162,8 @@ public partial class FormConfiguracion : Form
             Margin = new Padding(0, 0, 0, 15),
             Padding = new Padding(15),
             Width = panelPrincipal.Width - 40,
-            Height = 250
+            Height = 300,
+            AutoSize = false
         };
 
         var chkFormatos = new Dictionary<FormatoGanador, CheckBox>();
@@ -139,12 +187,13 @@ public partial class FormConfiguracion : Form
                 Font = new Font("Segoe UI", 10),
                 Checked = _config.FormatosActivos.Contains(formato),
                 Location = new Point(15, posY),
-                AutoSize = true
+                AutoSize = true,
+                Width = 500
             };
-            chk.CheckedChanged += (s, e) => ActualizarFormatos();
+            chk.CheckedChanged += (s, e) => ActualizarFormatos(chkFormatos);
             chkFormatos[formato] = chk;
             grpFormatos.Controls.Add(chk);
-            posY += 30;
+            posY += 35;
         }
         panelPrincipal.Controls.Add(grpFormatos);
 
@@ -152,7 +201,7 @@ public partial class FormConfiguracion : Form
         var panelBotones = new Panel
         {
             Dock = DockStyle.Bottom,
-            Height = 50,
+            Height = 60,
             BackColor = BackColor,
             Padding = new Padding(10)
         };
@@ -163,13 +212,14 @@ public partial class FormConfiguracion : Form
             Font = new Font("Segoe UI", 11, FontStyle.Bold),
             BackColor = Color.FromArgb(0, 104, 56),
             ForeColor = Color.White,
-            Width = 120,
-            Height = 35,
+            Width = 140,
+            Height = 40,
             Location = new Point(10, 10),
             Cursor = Cursors.Hand
         };
         btnAceptar.Click += (s, e) =>
         {
+            ConfiguracionResultado = _config;
             DialogResult = DialogResult.OK;
             Close();
         };
@@ -180,9 +230,9 @@ public partial class FormConfiguracion : Form
             Font = new Font("Segoe UI", 11, FontStyle.Bold),
             BackColor = Color.FromArgb(206, 17, 38),
             ForeColor = Color.White,
-            Width = 120,
-            Height = 35,
-            Location = new Point(140, 10),
+            Width = 140,
+            Height = 40,
+            Location = new Point(160, 10),
             Cursor = Cursors.Hand
         };
         btnCancelar.Click += (s, e) =>
@@ -198,22 +248,14 @@ public partial class FormConfiguracion : Form
         Controls.Add(panelBotones);
     }
 
-    private void ActualizarFormatos()
+    private void ActualizarFormatos(Dictionary<FormatoGanador, CheckBox> chkFormatos)
     {
-        // Actualizar lista de formatos seleccionados
         _config.FormatosActivos.Clear();
-        foreach (var chk in Controls.OfType<GroupBox>().LastOrDefault()?.Controls.OfType<CheckBox>() ?? Array.Empty<CheckBox>())
+        foreach (var (formato, chk) in chkFormatos)
         {
             if (chk.Checked)
             {
-                var texto = chk.Text;
-                if (texto.Contains("Horizontal")) _config.FormatosActivos.Add(FormatoGanador.LineaHorizontal);
-                else if (texto.Contains("Vertical")) _config.FormatosActivos.Add(FormatoGanador.LineaVertical);
-                else if (texto.Contains("Principal")) _config.FormatosActivos.Add(FormatoGanador.Diagonal);
-                else if (texto.Contains("Inversa")) _config.FormatosActivos.Add(FormatoGanador.DiagonalInvertida);
-                else if (texto.Contains("Cruz")) _config.FormatosActivos.Add(FormatoGanador.Cruz);
-                else if (texto.Contains("Plus")) _config.FormatosActivos.Add(FormatoGanador.Cruzita);
-                else if (texto.Contains("Llena")) _config.FormatosActivos.Add(FormatoGanador.TablaLlena);
+                _config.FormatosActivos.Add(formato);
             }
         }
     }
